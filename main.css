@@ -15,9 +15,12 @@ h3 {
 a:hover {
 	color:blue;
 }
+img {
+	vertical-align: middle;
+}
 .ui-button-text-only .ui-button-text {
 	padding: 0.2em 1em;
 }
-img {
-	vertical-align: middle;
+.ui-dialog .ui-dialog-titlebar {
+	padding: 0 0.5em;
 }

@@ -5,7 +5,7 @@ $(document).ready(function (e) {
 	});
 	// Renren
 	if (get_cookie("renren") != null) {
-		$("#info_renren").html("人人网已连接");
+		$("#info_renren").html("正在载入中，请耐心等候...<br>如果系统长时间无法载入，请<a href='#' onclick=\"del_cookie('renren');document.location.reload();\">点此</a>重置系统。");
 		get_renren_info();
 	} else {
 		$("#renren_link").click(function () {
@@ -16,9 +16,7 @@ $(document).ready(function (e) {
 
 function get_renren_info() {
 	$.post("./renren.php", {
-		method: "users.getInfo",
-		access_token: get_cookie("renren"),
-		fields: "uid,name,sex,star,zidou,vip,birthday,email_hash,tinyurl,headurl,mainurl,hometown_location,work_history,university_history"
+		access_token: get_cookie("renren")
 	}, function (xml) {
 		var data = eval(xml);
 		data = data[0];

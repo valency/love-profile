@@ -9,6 +9,7 @@
 <script type="text/javascript" src="../lib/jquery-ui-1.8.11.custom.min.js"></script>
 <script type="text/javascript" src="./lib.js"></script>
 <script type="text/javascript" src="./main.js"></script>
+<script type="text/javascript" src="./lib/string.js"></script>
 </head>
 <body onresize="$('#main').center({x:0,y:-100});">
 <div style="margin:15px;text-align:right;">
@@ -16,9 +17,13 @@
 </div>
 <div style="text-align:center;" id="main">
 	<img src="./img/logo.png"/><br><br>
-  	<input id="keyword" autocomplete="off"/>
-  	<button id="search_btn" style="color:#FF00FF;">喜欢此人</button><br><br>
-  	<a href="#">谁喜欢我？</a> ｜ <a href="./profile">完善我的资料</a>
+  	<input id="keyword" autocomplete="off" value="姓名、公司、学校等等..." onclick="this.value='';"/>
+  	<button id="search_btn" style="color:#FF00FF;">搜索</button><br><br>
+  	<a href="./profile">谁喜欢我？</a> ｜ <a href="./profile">完善我的资料</a><br><br>
+    <a name="xn_share" type="button_count_right" href="#">分享到人人</a>
+	<script src="http://static.connect.renren.com/js/share.js" type="text/javascript"></script>
+    <br><br>
+    <span style="color:grey">恋爱手册可以帮助你寻找你喜欢的人、朋友和熟人，获取更具针对性和对您有意义的内容。</span>
 </div>
 <div style="position:absolute;bottom:15px;text-align:center;width:100%;color:grey;">
 	(C) 2011 <a href="http://ihome.ust.hk/~valency" target="_blank" >Ye Ding</a>, The Hong Kong University of Science and Technology,
