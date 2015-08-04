@@ -1,0 +1,34 @@
+<html> 
+<head> 
+<title> 40.4% ERROR </title> 
+</head> 
+<script language="JavaScript"> 
+function rand_num(n) {
+	var now = new Date();
+	var rand = Math.round(n * Math.cos(now.getTime()));
+	if (rand < 0) rand = -rand;
+	if (rand == 0) rand++;
+	return rand;
+}
+var back = "";
+var max = 6;
+if (navigator.appName == "Netscape" && navigator.appVersion.charAt(0) == 2) {
+	var ran = rand_num(max)
+} else {
+	var ran = Math.ceil(Math.random() * max);
+}
+if (ran == 1) back = "#00ffff";
+if (ran == 2) back = "#00ff00";
+if (ran == 3) back = "#ff0000";
+if (ran == 4) back = "#ffff00";
+if (ran == 5) back = "#0000ff";
+if (ran == 6) back = "#ff00ff";
+document.write("</head>");
+document.write("<body bgcolor='" + back + "'  TEXT='#000000' LINK='#ffffff' ALINK='#000000'  VLINK='#ffffff' >");
+</script> 
+<body bgcolor="#ffff00"  text="#FFFFFF" link="#FFFFFF" vlink="#FFFFFF" > 
+<table border=0 height=100%><tr><td valign=top> 
+<br><br><br> 
+<dir><PRE><A HREF="./" target="_top"><img src="img/4.gif" border=0></A><A HREF="./" target="_top"><img src="img/0.gif" border=0></A><A HREF="./" target="_top"><img src="img/4.gif" border=0></A> 
+</td></tr><tr><td valign=bottom> 
+<dir><img src="img/dd.gif"  border=0 align=absmiddle><br><br><br><br></td></tr></table></body></html> 

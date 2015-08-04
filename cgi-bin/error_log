@@ -1,0 +1,4 @@
+[01-Oct-2011 19:27:38] PHP Warning:  mysql_connect() [<a href='function.mysql-connect'>function.mysql-connect</a>]: Access denied for user 'loveprof_profile'@'localhost' (using password: YES) in /home3/loveprof/public_html/cgi-bin/common.php on line 2
+[01-Oct-2011 19:27:38] PHP Warning:  mysql_query(): supplied argument is not a valid MySQL-Link resource in /home3/loveprof/public_html/cgi-bin/count.php on line 5
+[01-Oct-2011 19:27:38] PHP Warning:  mysql_fetch_row(): supplied argument is not a valid MySQL result resource in /home3/loveprof/public_html/cgi-bin/count.php on line 6
+[02-Oct-2011 01:47:05] PHP Fatal error:  Call to undefined function  replace() in /home3/loveprof/public_html/cgi-bin/search.php on line 42

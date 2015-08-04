@@ -1,0 +1,26 @@
+body {
+	font: 75% "Trebuchet MS", sans-serif;
+	line-height: 2em;
+	overflow: hidden;
+	margin:0;
+}
+a {
+	text-decoration: none;
+	color:#FF00FF;
+}
+h3 {
+	margin-top:0;
+	text-align:center;
+}
+a:hover {
+	color:blue;
+}
+img {
+	vertical-align: middle;
+}
+.ui-button-text-only .ui-button-text {
+	padding: 0.2em 1em;
+}
+.ui-dialog .ui-dialog-titlebar {
+	padding: 0 0.5em;
+}

@@ -1,0 +1,99 @@
+<!doctype html>
+<html>
+<head>
+<title>XD CallBack</title>
+</head>
+<body onload="dispatchLocationFragment();">
+<div id="swf_holder" style="position:absolute;top:-10000px;width:1px;height:1px;"></div>
+<script>
+	function resolveRelation(relation) {
+		var pt, matches, parts = relation.split('.'), node = window;
+		for ( var i = 0, l = parts.length; i < l; i++) {
+			pt = parts[i];
+			if (pt === 'opener' || pt === 'parent' || pt === 'top') {
+				node = node[pt];
+			} else if (matches = /^frames\[['"]?([a-zA-Z0-9-_]+)['"]?\]$/
+					.exec(pt)) {
+				node = node.frames[matches[1]];
+			} else {
+				throw new SyntaxError('Malformed id to resolve: ' + relation
+						+ ', pt: ' + pt);
+			}
+		}
+		return node;
+	}
+
+	function createXdCommSwf() {
+		var XdCommUrl = "http:\/\/s.xnimg.cn\/connect\/swf\/XdComm.swf", html = ('<object type="application/x-shockwave-flash" id="XdComm"'
+				+ (!!document.attachEvent ? ' name="XdComm" classid="clsid:d27cdb6e-ae6d-11cf-96b8-444553540000"'
+						: ' data="' + XdCommUrl + '"') + '><param name="movie" value="'
+				+ XdCommUrl + '"></param><param name="allowScriptAccess" value="always"></param><param name="flashVars" value="onReady=onFlashReady"/></object>');
+		document.getElementById('swf_holder').innerHTML = html;
+	}
+
+	function parsePiece(key, val, base) {
+		var sliced = /([^\]]*)\[([^\]]*)\](.*)?/.exec(key);
+		if (!sliced) {
+			base[key] = val;
+			return;
+		}
+		var prop = sliced[1], subp = sliced[2], others = sliced[3];
+		if (!isNaN(subp)) {
+			var numVal = +subp;
+			if (subp === numVal.toString(10)) {
+				subp = numVal;
+			}
+		}
+		base[prop] = base[prop] || (typeof subp == 'number' ? [] : {});
+		if (others == null)
+			base[prop][subp] = val;
+		else
+			parsePiece('' + subp + others, val, base[prop]);
+	}
+
+	function fromQueryString(qs) {
+		var decode = function(s) {
+			return decodeURIComponent(s.replace(/\+/g, ' '));
+		}, params = {}, parts = qs.split('&'), pair, val;
+		for ( var i = 0; i < parts.length; i++) {
+			pair = parts[i].split('=', 2);
+			if (pair && pair[0]) {
+				val = decode(pair[1]);
+				if (val instanceof String || typeof val == 'string') {
+					val = val.replace(/^\s+|\s+$/g, '');
+					// convert numerals to numbers
+					if (!isNaN(val)) {
+						numVal = +val;
+						if (val === numVal.toString(10)) {
+							val = numVal;
+						}
+					}
+				}
+				parsePiece(decode(pair[0]), val, params);
+			}
+		}
+		return params;
+	}
+
+	function dispatchLocationFragment(loc) {
+		loc = loc || location.toString();
+		if (loc.indexOf('#') == -1)
+			return;
+		var fragment = loc.substr(loc.indexOf('#') + 1), params = fromQueryString(fragment);
+		if (params.transport == 'postMessage') {
+			resolveRelation(params.relation).postMessage(fragment,
+					params.origin);
+		} else if (params.transport == 'flash') {
+			var origin = (window.location.protocol + '//'
+					+ window.location.host + '/' + (Math.random() * (1 << 30))
+					.toString(36).replace('.', ''));
+			window.onFlashReady = function() {
+				document.XdComm.postMessage_init('dummy', origin);
+				document.XdComm.postMessage_send(params, params.origin);
+			};
+			createXdCommSwf();
+		}
+	}
+</script>
+</body>
+</html>

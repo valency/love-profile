@@ -1,0 +1,141 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * 本方法是对调用dialog的封装，用以弹出各种对话界面，如发送新鲜事，授权，邀请。对dialog的详细信息可见： &lt;a
+<span class='line'>  3</span>  * href="http://wiki.dev.renren.com/wiki/%E4%BA%BA%E4%BA%BA%E7%BD%91%E5%BC%80%E6%94%BE%E5%B9%B3%E5%8F%B0%E6%8A%80%E6%9C%AF%E6%9E%B6%E6%9E%84#Widget_API">Widget
+<span class='line'>  4</span>  * API - Dialog&lt;/a>
+<span class='line'>  5</span>  * 
+<span class='line'>  6</span>  * @methodOf Renren
+<span class='line'>  7</span>  * @param options
+<span class='line'>  8</span>  *            {Object}
+<span class='line'>  9</span>  * @param options.url
+<span class='line'> 10</span>  *            {String} 请求dialog url或oauth
+<span class='line'> 11</span>  *            url，非http、https开头的值将视为相对于http://widget.renren.com/dialog/的路径
+<span class='line'> 12</span>  * @param options.method
+<span class='line'> 13</span>  *            {String} (optional) http请求方法，可选值：GET、POST，默认为GET，只在必要时使用POST，因在经过登录流程时会被改为GET请求
+<span class='line'> 14</span>  * @param options.display
+<span class='line'> 15</span>  *            {String} 页面在何处显示，可选值：popup（新窗口）、iframe（类似dialog的效果）、page（当前窗口）
+<span class='line'> 16</span>  * @param options.style
+<span class='line'> 17</span>  *            {Object} (optional) ui的样式如：{top : 100, left : 300, width : 450,
+<span class='line'> 18</span>  *            height : 350}，相应值没设置时会根据窗口大小在合适位置显示
+<span class='line'> 19</span>  * @param options.params
+<span class='line'> 20</span>  *            {Object} 请求所需参数值，因调用dialog而不同，相关所需参数可见各dialog的文档
+<span class='line'> 21</span>  * @param options.fallback
+<span class='line'> 22</span>  *            {boolean} (optional)
+<span class='line'> 23</span>  *            默认为true，做些容错处理，如当请求参数过长超过浏览器限制，将转化http请求方法为POST;若用popup显示时被浏览器
+<span class='line'> 24</span>  *            阻止弹窗时将用当前窗口显示，完成后再跳转回当前页，即同options.display =
+<span class='line'> 25</span>  *            page。若需自己处理这些情况时可设值为false。
+<span class='line'> 26</span>  * @param options.onSuccess
+<span class='line'> 27</span>  *            {Function} (optional) 请求成功后的回调函数，请求结果做为回调函数的参数传入
+<span class='line'> 28</span>  * @param options.onFailure
+<span class='line'> 29</span>  *            {Function} (optional) 请求失败后的回调函数，请求结果做为回调函数的参数传入
+<span class='line'> 30</span>  * @param options.onComplete
+<span class='line'> 31</span>  *            {Function} (optional) 请求完成后的回调函数，不论请求成功或失败都会被调用，请求结果做为回调函数的参数传入
+<span class='line'> 32</span>  * @param cb
+<span class='line'> 33</span>  *            {Function} (optional)
+<span class='line'> 34</span>  *            作用同options.onComplete，若options.onComplete已设值则此值无效
+<span class='line'> 35</span>  *            @example
+<span class='line'> 36</span>  * Renren.ui({
+<span class='line'> 37</span>  *	url : 'feed',
+<span class='line'> 38</span>  *	display : 'popup',
+<span class='line'> 39</span>  *	style : {
+<span class='line'> 40</span>  *		top : 50
+<span class='line'> 41</span>  *	},
+<span class='line'> 42</span>  *	params : {
+<span class='line'> 43</span>  *		url:'http://www.swimmingacross.com',
+<span class='line'> 44</span>  *		name: '新鲜事测试',
+<span class='line'> 45</span>  *		description:'测试',
+<span class='line'> 46</span>  *		image:'http://at-img4.tdimg.com/board/2011/5/46465.jpg'
+<span class='line'> 47</span>  *	},
+<span class='line'> 48</span>  *	onComplete: function(r){if(window.console) console.log("complete");},
+<span class='line'> 49</span>  *	onFailure: function(r){if(window.console) console.log("failure:" + r.error + ' ' + r.error_description);} 
+<span class='line'> 50</span>  * });
+<span class='line'> 51</span>  */</span><span class="WHIT">
+<span class='line'> 52</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">ui</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">cb</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 53</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">options.url</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 54</span> </span><span class="WHIT">		</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">'The url argument must not be null.'</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 55</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 56</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">url</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">options.url</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">url</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">url.indexOf</span><span class="PUNC">(</span><span class="STRN">'http://'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">url</span><span class="WHIT">
+<span class='line'> 57</span> </span><span class="WHIT">			</span><span class="PUNC">.</span><span class="NAME">indexOf</span><span class="PUNC">(</span><span class="STRN">'https://'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 58</span> </span><span class="WHIT">			</span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">url</span><span class="WHIT">
+<span class='line'> 59</span> </span><span class="WHIT">			</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rrUrls.widget</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="STRN">'dialog/'</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">url</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 60</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">p</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="REGX">/^(https?:\/\/[^\/]*\/)([^\/\?#]*\/)*([^\/\?#]*)/</span><span class="PUNC">.</span><span class="NAME">exec</span><span class="PUNC">(</span><span class="NAME">url</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 61</span> </span><span class="WHIT">	</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">p</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="WHIT">
+<span class='line'> 62</span> </span><span class="WHIT">			</span><span class="PUNC">||</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rrUrls.widget</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">p</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">rrUrls.graph</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">p</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">rrUrls.graph_https</span><span class="WHIT"> </span><span class="PUNC">!=</span><span class="WHIT"> </span><span class="NAME">p</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 63</span> </span><span class="WHIT">		</span><span class="KEYW">return</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 64</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 65</span> </span><span class="WHIT">	</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">reqOptns</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">combine</span><span class="PUNC">(</span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 66</span> </span><span class="WHIT">				</span><span class="NAME">url</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">url</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 67</span> </span><span class="WHIT">				</span><span class="NAME">method</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options.method</span><span class="WHIT">
+<span class='line'> 68</span> </span><span class="WHIT">						</span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">options.method.toUpperCase</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">===</span><span class="WHIT"> </span><span class="STRN">'POST'</span><span class="WHIT">
+<span class='line'> 69</span> </span><span class="WHIT">						</span><span class="PUNC">?</span><span class="WHIT"> </span><span class="STRN">'POST'</span><span class="WHIT">
+<span class='line'> 70</span> </span><span class="WHIT">						</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'GET'</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 71</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">options</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">defaults</span><span class="PUNC">[</span><span class="PUNC">(</span><span class="NAME">p</span><span class="PUNC">[</span><span class="NUMB">3</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="STRN">''</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toLowerCase</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 72</span> </span><span class="WHIT">				</span><span class="NAME">display</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'popup'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 73</span> </span><span class="WHIT">				</span><span class="NAME">style</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 74</span> </span><span class="WHIT">					</span><span class="NAME">width</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">475</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 75</span> </span><span class="WHIT">					</span><span class="NAME">height</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">340</span><span class="WHIT">
+<span class='line'> 76</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 77</span> </span><span class="WHIT">				</span><span class="NAME">params</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 78</span> </span><span class="WHIT">					</span><span class="NAME">app_id</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">rrUrls.widget</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">p</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="WHIT">
+<span class='line'> 79</span> </span><span class="WHIT">							</span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">Renren.options.appId</span><span class="WHIT">
+<span class='line'> 80</span> </span><span class="WHIT">							</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 81</span> </span><span class="WHIT">					</span><span class="NAME">client_id</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">rrUrls.graph</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">p</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="WHIT"> </span><span class="PUNC">||</span><span class="WHIT"> </span><span class="NAME">rrUrls.graph_https</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="NAME">p</span><span class="PUNC">[</span><span class="NUMB">1</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT">
+<span class='line'> 82</span> </span><span class="WHIT">							</span><span class="PUNC">?</span><span class="WHIT"> </span><span class="NAME">Renren.options.appId</span><span class="WHIT">
+<span class='line'> 83</span> </span><span class="WHIT">							</span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">null</span><span class="WHIT">
+<span class='line'> 84</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 85</span> </span><span class="WHIT">				</span><span class="NAME">onComplete</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NAME">cb</span><span class="WHIT">
+<span class='line'> 86</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 87</span> 
+<span class='line'> 88</span> </span><span class="WHIT">	</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">reqOpts</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 89</span> </span><span class="WHIT">		</span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">display</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">reqOpts.display</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">request</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 90</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">display.length</span><span class="WHIT"> </span><span class="PUNC">></span><span class="WHIT"> </span><span class="NUMB">0</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 91</span> </span><span class="WHIT">			</span><span class="NAME">display</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">display.substr</span><span class="PUNC">(</span><span class="NUMB">0</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">.</span><span class="NAME">toUpperCase</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">+</span><span class="WHIT"> </span><span class="NAME">display.substr</span><span class="PUNC">(</span><span class="NUMB">1</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 92</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 93</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">Request</span><span class="PUNC">[</span><span class="NAME">display</span><span class="PUNC">]</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 94</span> </span><span class="WHIT">			</span><span class="NAME">request</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Request</span><span class="PUNC">[</span><span class="NAME">display</span><span class="PUNC">]</span><span class="PUNC">(</span><span class="NAME">reqOpts</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 95</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 96</span> </span><span class="WHIT">		</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="PUNC">!</span><span class="NAME">request</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 97</span> </span><span class="WHIT">			</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="KEYW">new</span><span class="WHIT"> </span><span class="NAME">Error</span><span class="PUNC">(</span><span class="STRN">"Fail to start an ui request, the display argument may be invalid."</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 98</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 99</span> </span><span class="WHIT">		</span><span class="KEYW">try</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>100</span> </span><span class="WHIT">			</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">request.send</span><span class="PUNC">(</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>101</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">catch</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">e</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>102</span> </span><span class="WHIT">			</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">options.fallback</span><span class="WHIT"> </span><span class="PUNC">!==</span><span class="WHIT"> </span><span class="KEYW">false</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>103</span> </span><span class="WHIT">				</span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">e.name</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'UrlTooLongError'</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>104</span> </span><span class="WHIT">					</span><span class="COMM">// change http method to POST</span><span class="WHIT">
+<span class='line'>105</span> </span><span class="WHIT">					</span><span class="NAME">reqOpts.method</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'POST'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>106</span> </span><span class="WHIT">					</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">arguments.callee</span><span class="PUNC">(</span><span class="NAME">reqOpts</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>107</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="WHIT"> </span><span class="KEYW">else</span><span class="WHIT"> </span><span class="KEYW">if</span><span class="WHIT"> </span><span class="PUNC">(</span><span class="NAME">e.name</span><span class="WHIT"> </span><span class="PUNC">==</span><span class="WHIT"> </span><span class="STRN">'UICreateError'</span><span class="WHIT">
+<span class='line'>108</span> </span><span class="WHIT">						</span><span class="PUNC">&&</span><span class="WHIT"> </span><span class="NAME">request</span><span class="WHIT"> </span><span class="KEYW">instanceof</span><span class="WHIT"> </span><span class="NAME">Request.Popup</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>109</span> </span><span class="WHIT">					</span><span class="COMM">// popup window may be blocked, fall back to use current</span><span class="WHIT">
+<span class='line'>110</span> </span><span class="WHIT">					</span><span class="COMM">// window</span><span class="WHIT">
+<span class='line'>111</span> </span><span class="WHIT">					</span><span class="NAME">reqOpts.display</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="STRN">'page'</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>112</span> </span><span class="WHIT">					</span><span class="KEYW">return</span><span class="WHIT"> </span><span class="NAME">arguments.callee</span><span class="PUNC">(</span><span class="NAME">reqOpts</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>113</span> </span><span class="WHIT">				</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>114</span> </span><span class="WHIT">			</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>115</span> </span><span class="WHIT">			</span><span class="KEYW">throw</span><span class="WHIT"> </span><span class="NAME">e</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>116</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>117</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">)</span><span class="PUNC">(</span><span class="NAME">reqOptns</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>118</span> </span><span class="PUNC">}</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'>119</span> 
+<span class='line'>120</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">defaults</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>121</span> </span><span class="WHIT">	</span><span class="STRN">'authorize'</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>122</span> </span><span class="WHIT">		</span><span class="NAME">display</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'page'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>123</span> </span><span class="WHIT">		</span><span class="NAME">style</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>124</span> </span><span class="WHIT">			</span><span class="NAME">width</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">570</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>125</span> </span><span class="WHIT">			</span><span class="NAME">height</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">340</span><span class="WHIT">
+<span class='line'>126</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>127</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>128</span> </span><span class="WHIT">	</span><span class="STRN">'request'</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>129</span> </span><span class="WHIT">		</span><span class="NAME">style</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'>130</span> </span><span class="WHIT">			</span><span class="NAME">width</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">600</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'>131</span> </span><span class="WHIT">			</span><span class="NAME">height</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="NUMB">550</span><span class="WHIT">
+<span class='line'>132</span> </span><span class="WHIT">		</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>133</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'>134</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>

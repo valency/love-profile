@@ -1,0 +1,89 @@
+<?xml version="1.0" standalone="yes"?>
+<project basedir="." default="consolidate.js">
+
+	<!--
+		general file locations
+	-->
+	<property name="src_home" value="${basedir}/src" />
+	<property name="build_home" value="${basedir}/build" />
+	<property name="yuicompressor.jar" value="${build_home}/lib/yuicompressor-2.4.6.jar" />
+	<property name="closure-compiler.jar" value="${build_home}/lib/closure-compiler.jar" />
+
+	<property name="rr.js" value="${build_home}/js/renren.js" />
+	<property name="rr-yc.js" value="${build_home}/js/renren-yc.js" />
+	<property name="rr-gc.js" value="${build_home}/js/renren-gc.js" />
+	<property name="version" value="1.0" />
+
+	<tstamp>
+		<format property="date" pattern="yyyy-MM-dd HH:mm" />
+	</tstamp>
+
+	<!-- @start consolidate -->
+	<target name="reconsolidate.js.check">
+		<condition property="js.uptodate">
+			<uptodate targetfile="${rr.js}">
+				<srcfiles dir="${src_home}" includes="intro.js" />
+				<srcfiles dir="${src_home}" includes="outro.js" />
+				<srcfiles dir="${src_home}" includes="browser.js" />
+				<srcfiles dir="${src_home}" includes="class.js" />
+				<srcfiles dir="${src_home}" includes="dom.js" />
+				<srcfiles dir="${src_home}" includes="flash.js" />
+				<srcfiles dir="${src_home}" includes="init.js" />
+				<srcfiles dir="${src_home}" includes="request.js" />
+				<srcfiles dir="${src_home}" includes="ui.js" />
+				<srcfiles dir="${src_home}" includes="utils.js" />
+				<srcfiles dir="${src_home}" includes="xd.js" />
+				<srcfiles dir="${src_home}" includes="xdpc.js" />
+			</uptodate>
+		</condition>
+	</target>
+
+	<target name="consolidate.js" depends="reconsolidate.js.check" unless="js.uptodate">
+		<echo message="Consolidating js" />
+		<concat destfile="${rr.js}" encoding="UTF-8" fixlastline="yes">
+			<filelist dir="${src_home}">
+				<file name="intro.js" />
+				<file name="init.js" />
+				<file name="utils.js" />
+				<file name="class.js" />
+				<file name="browser.js" />
+				<file name="flash.js" />
+				<file name="dom.js" />
+				<file name="xd.js" />
+				<file name="request.js" />
+				<file name="ui.js" />
+				<file name="xdpc.js" />
+				<file name="outro.js" />
+			</filelist>
+		</concat>
+		<replaceregexp match="@VERSION" replace="${version}" flags="g" file="${rr.js}" />
+		<replaceregexp match="@DATE" replace="${date}" file="${rr.js}" />
+	</target>
+	<!-- @end consolidate -->
+
+	<target name="compress.js" depends="consolidate.js">
+		<echo message="Compressing js use YUI Compressor" />
+		<java jar="${yuicompressor.jar}" fork="true" failonerror="true" output="${rr-yc.js}">
+			<arg value="--charset" />
+			<arg value="UTF-8" />
+			<arg value="${rr.js}" />
+		</java>
+		<echo message="Compressing js use google Closure Compiler" />
+		<java jar="${closure-compiler.jar}" fork="true" failonerror="true">
+			<arg value="--js" />
+			<arg value="${rr.js}" />
+			<arg value="--js_output_file" />
+			<arg value="${rr-gc.js}" />
+		</java>
+	</target>
+
+	<target name="build.js" depends="consolidate.js, compress.js">
+	</target>
+
+	<target name="clean.js">
+		<delete file="${rr.js}" />
+		<delete file="${rr-yc.js}" />
+		<delete file="${rr-gc.js}" />
+	</target>
+
+</project>

@@ -1,0 +1,134 @@
+<!doctype html>
+<html>
+ <head>
+<!--
+dialog调用demo页面，请放到服务器或本地绑定域名测试，并确保renren.js的引用路径正确
+-->
+  <title>UI test</title>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <script src="http://ajax.googleapis.com/ajax/libs/mootools/1.3.2/mootools-yui-compressed.js"></script>
+  <script type="text/javascript" src="../build/js/renren.js"></script>
+  <script type="text/javascript">  
+  var qs = location.search.substring(1), appId = '29706', pos = qs.indexOf('app_id='), accessToken;
+  if(pos >= 0){
+	  var ep = qs.indexOf('&', pos+7);
+	  appId = qs.substring(pos+7, ep==-1? qs.length:ep);
+  }
+  
+  window.addEvent('domready', function() {
+	  changeParams();
+	  document.getElementById('appId').value = appId;
+	  Renren.init({appId:appId});
+  });
+  var params = {
+		authorize : {
+				response_type : 'token',
+				client_id : appId
+			},
+		authorize_http : {
+				response_type : 'token',
+				client_id : appId
+			},
+		feed : {
+				url:'http://www.swimmingacross.com',
+				name: '新鲜事测试',
+				description:'测试dialog',
+				image:'http://at-img4.tdimg.com/board/2011/5/46465.jpg'
+			},
+		request : {
+			accept_url:'http://www.swimmingacross.com',
+			actiontext: '邀请测试',
+			accept_label:'测试dialog'
+		}
+  }
+  function ui(){
+	  var url = document.getElementById('url').value;
+	  if(url=='authorize') 
+		  url = 'https://graph.renren.com/oauth/authorize';
+	  else if(url=='authorize_http') 
+		  url = 'http://graph.renren.com/oauth/authorize';
+	  var display = document.getElementById('display').value, method = document.getElementById('method').value,
+	  left = document.getElementById('left').value, top = document.getElementById('top').value,
+	  width = document.getElementById('width').value, height = document.getElementById('height').value,
+	  params = document.getElementById('params').value;
+	  var uiOpts = {
+		  url : url,
+		  display : display==''? null : display,
+		  method : method==''? null : method,
+		  style : {
+			  top : top==''? null : top,
+			  left : left==''? null : left,
+			  width : width==''? null : width,
+			  height : height==''? null : height					  
+		  },
+		  params : 	JSON.decode(params),
+		  onComplete : function(response){
+			  if(window.console) 
+				  console.log("complete: "+JSON.encode(response));
+		  },
+		  onSuccess : function(response){
+			  if(window.console) 
+				  console.log("success: "+JSON.encode(response));
+			  if(response.access_token){
+				  accessToken = response.access_token;
+				  alert("access token: " + accessToken);
+			  }
+		  },
+		  onFailure : function(response){
+			  if(window.console) 
+				  console.log("failure: " + response.error + ',' + response.error_description);
+	 	  } 
+	  };
+	  if(!uiOpts.params.access_token)
+		uiOpts.params.access_token = accessToken;
+	  Renren.ui(uiOpts);
+  }
+  function changeParams(){
+	  var url = document.getElementById('urls').value;
+	  document.getElementById('url').readOnly = (url!='');
+	  document.getElementById('url').value = url;
+	  document.getElementById('params').value = params[url]? JSON.encode(params[url]):'';	  
+  }
+  function changeAppId(v){
+	  location.href = location.href.replace(location.search,'')+'?app_id='+v
+  }
+  </script>
+ </head>
+ <body>
+ 	app id：
+ 	<input type="text" value="29706" size="10" id="appId" onchange="changeAppId(this.value);"></input>
+<br/><br/>
+	url：
+	<select id="urls" onchange="changeParams()">
+		<option value="feed" selected="selected">feed</option>
+		<option value="authorize">authorize</option>
+		<option value="authorize_http">authorize_http</option> 
+		<option value="request">request</option>
+		<option value=""></option>
+	</select>
+ 	<input type="text" value="" size="20" id="url" readonly="readonly"></input> 
+ 	display：
+ 	<select id="display">
+		<option></option>
+		<option value="popup">popup</option>
+		<option value="iframe">iframe</option>
+		<option value="page">page</option>
+	</select> 
+ 	method：
+	<select id="method">
+		<option></option>
+		<option value="get">get</option>
+		<option value="post">post</option>
+	</select>
+<br/><br/>
+	 top：<input type="text" value="" size="5" id="top"></input>
+	 left：<input type="text" value="" size="5" id="left"></input> 
+	 width：<input type="text" value="" size="5" id="width"></input>
+	 height：<input type="text" value="" size="5" id="height"></input>
+<br/><br/>
+	<div>params：</div>
+	<textarea cols="100" rows="10" id="params"></textarea>
+<br/><br/>
+	<input type="button" value="确定" onclick="ui();"/>
+ </body>
+</html>

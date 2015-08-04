@@ -1,0 +1,46 @@
+<html><head><meta http-equiv="content-type" content="text/html; charset=UTF-8"> <style>
+	.KEYW {color: #933;}
+	.COMM {color: #bbb; font-style: italic;}
+	.NUMB {color: #393;}
+	.STRN {color: #393;}
+	.REGX {color: #339;}
+	.line {border-right: 1px dotted #666; color: #666; font-style: normal;}
+	</style></head><body><pre><span class='line'>  1</span> <span class="COMM">/**
+<span class='line'>  2</span>  * 引入方式：&lt;br/>
+<span class='line'>  3</span>  * &lt;script type="text/javascript" src="url to this js file"&gt;&lt;/script&gt;&lt;br/>
+<span class='line'>  4</span>  * js sdk在加载解释阶段不会改变文档的内容，可加上defer等属性以加快加载速度：&lt;br/>
+<span class='line'>  5</span>  * &lt;script type="text/javascript" src="url to this js file" charset="utf-8" defer="defer"&gt;&lt;/script&gt;
+<span class='line'>  6</span>  * @class 全局范围内可访问对象，各种公开接口的入口
+<span class='line'>  7</span>  * @static
+<span class='line'>  8</span>  */</span><span class="WHIT">
+<span class='line'>  9</span> </span><span class="KEYW">var</span><span class="WHIT"> </span><span class="NAME">Renren</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 10</span> </span><span class="WHIT">	</span><span class="WHIT">
+<span class='line'> 11</span> </span><span class="WHIT">	</span><span class="NAME">options</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 12</span> 
+<span class='line'> 13</span> </span><span class="WHIT">	</span><span class="COMM">/**
+<span class='line'> 14</span> 	 * 初始化sdk，建议在dom加载完成后调用，或在&lt;body&gt;下的&lt;script&gt;标签中调用。
+<span class='line'> 15</span> 	 * @param options {Object} 
+<span class='line'> 16</span> 	 * @param options.appId {Number}
+<span class='line'> 17</span> 	 *            应用id，如此处设值，在其它需要app id值时，如用Renren.ui调用dialog时可不用设app_id参数
+<span class='line'> 18</span> 	 * @param options.originPath {String} (optional)
+<span class='line'> 19</span> 	 *            用于构成跨域的origin值，origin用以唯一标识当前加载的页面，默认情况下 origin =
+<span class='line'> 20</span> 	 *            location.protocol + '//' + location.host + '/' + 随机字符串;
+<span class='line'> 21</span> 	 *            一般不需要设置此值，此值存在则 origin = location.protocol + '//' +
+<span class='line'> 22</span> 	 *            location.host + '/' + options.originPath
+<span class='line'> 23</span> 	 * @example Renren.init({appId:29706});           
+<span class='line'> 24</span> 	 */</span><span class="WHIT">
+<span class='line'> 25</span> </span><span class="WHIT">	</span><span class="NAME">init</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="KEYW">function</span><span class="PUNC">(</span><span class="NAME">options</span><span class="PUNC">)</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 26</span> </span><span class="WHIT">		</span><span class="NAME">this.options</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="NAME">merge.apply</span><span class="PUNC">(</span><span class="KEYW">null</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">append</span><span class="PUNC">(</span><span class="PUNC">[</span><span class="PUNC">{</span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">this.options</span><span class="PUNC">]</span><span class="PUNC">,</span><span class="WHIT"> </span><span class="NAME">arguments</span><span class="PUNC">)</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 27</span> </span><span class="WHIT">		</span><span class="NAME">XD.init</span><span class="PUNC">(</span><span class="NAME">this.options</span><span class="PUNC">)</span><span class="PUNC">;</span><span class="WHIT">
+<span class='line'> 28</span> </span><span class="WHIT">	</span><span class="PUNC">}</span><span class="WHIT">
+<span class='line'> 29</span> </span><span class="PUNC">}</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 30</span> 
+<span class='line'> 31</span> </span><span class="NAME">rrUrls</span><span class="WHIT"> </span><span class="PUNC">=</span><span class="WHIT"> </span><span class="PUNC">{</span><span class="WHIT">
+<span class='line'> 32</span> </span><span class="WHIT">	</span><span class="NAME">widget</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'http://widget.renren.com/'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 33</span> </span><span class="WHIT">	</span><span class="NAME">rrstatic</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'http://s.xnimg.cn/'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 34</span> </span><span class="WHIT">	</span><span class="NAME">apps</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'http://apps.renren.com/'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 35</span> </span><span class="WHIT">	</span><span class="NAME">graph</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'http://graph.renren.com/'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 36</span> </span><span class="WHIT">	</span><span class="NAME">graph_https</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'https://graph.renren.com/'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 37</span> </span><span class="WHIT">	</span><span class="NAME">callback</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'http://widget.renren.com/xd_callback.html'</span><span class="PUNC">,</span><span class="WHIT">
+<span class='line'> 38</span> </span><span class="WHIT">	</span><span class="NAME">widgetOrigin</span><span class="WHIT"> </span><span class="PUNC">:</span><span class="WHIT"> </span><span class="STRN">'http://widget.renren.com'</span><span class="WHIT">
+<span class='line'> 39</span> </span><span class="PUNC">}</span><span class="PUNC">;</span></pre></body></html>
